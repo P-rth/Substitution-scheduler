@@ -1,16 +1,21 @@
 import PySimpleGUI as sg
 from pyxl import *
 import shutil
+from sys import exit
 import os
 
 
 try:
     data,error = read_data('Teacher_data.xlsx')
 except:
-    data_path = sg.popup_get_file('Data file not found Please select manually:',keep_on_top=True,file_types=(('Exel Teacher time-table data file','xlsx')))
-    shutil.copy(data_path, 'Teacher_data.xlsx', follow_symlinks=True)
-    data,error = read_data('Teacher_data.xlsx')
-    
+    data_path = sg.popup_get_file('Data file not found Please select manually:',keep_on_top=True,no_titlebar=True,file_types=((('Exel Teacher time-table data file', 'xlsx'),)))
+    print(data_path)
+    if data_path != None and data_path.strip() != '':
+        shutil.copy(data_path, 'Teacher_data.xlsx', follow_symlinks=True)
+        data,error = read_data('Teacher_data.xlsx')
+    else:
+        sg.popup('Blank Path selected, Exiting!')
+        exit()  
     
 dep_found=find_departments(data)+['ANY']
 
@@ -28,18 +33,20 @@ if not error:
                 [sg.Combo(values=dep_found,readonly=True,expand_x=True,key='department',auto_size_text=True,enable_events=True,default_value='ANY')],
                 [sg.Button(name,size = (10,1)) for name in Day],
                 [sg.Button(name,size=(6,1),expand_x=True) for name in period],
-                [sg.Listbox(values=teachers,key = 'free_list',text_color='Green',expand_x=True,expand_y=True,size = (24,30),right_click_menu=['&Right',['Edit Data','Exit']]),
-                 sg.Listbox(values=teachers,key = 'busy_list',text_color='Red',expand_x=True,expand_y=True,size = (24,30),right_click_menu=['&Right',['Edit Data','Exit']])]
+                [sg.Listbox(values=teachers,key = 'free_list',text_color='Green',expand_x=True,expand_y=True,size = (24,30),right_click_menu=['&Right',['Edit Data','Info','Exit']]),
+                 sg.Listbox(values=teachers,key = 'busy_list',text_color='Red',expand_x=True,expand_y=True,size = (24,30),right_click_menu=['&Right',['Edit Data','Info','Exit']])]
                 ]
 
-    window = sg.Window('Window Title', layout,element_padding=0,scaling=2)
+    window = sg.Window('Substitution sheduler', layout,element_padding=0,scaling=2,icon='icon.ico')
 
     while True:             # Event Loop
         event, values = window.read()
         if event in (None, 'Exit'):
             break
+        if event == 'Info':
+            sg.popup('Made By Parth Sahni of class XII-E \n   completed on april 22 2023')
         if event == 'Edit Data':
-             os.system('Teacher_data.xlsx')
+             window.start_thread(lambda: os.system('Teacher_data.xlsx'), ('-THREAD-', '-THEAD ENDED-'))
         if event in Day:
             for k in Day:
                 window[k].update(button_color=sg.theme_button_color())
