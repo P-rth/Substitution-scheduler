@@ -16,11 +16,14 @@ except:
     else:
         sg.popup('Blank Path selected, Exiting!')
         exit()  
+        
+data = tuple(data) #make data immutatable
     
-dep_found=find_departments(data)+['ANY']
+dep_found=find_departments(data)+['All']
 
 if not error:
-    sg.theme('Greenmono')
+    sg.theme('SandyBeach')
+    bg_b = sg.theme_element_background_color()
     teachers = []
     Day = ['Monday','Tuesday','Wednesday','Thursday','Friday']
     period = ['1','2','3','4','5','6','7','8']
@@ -28,23 +31,49 @@ if not error:
     active_day = None
     active_period = None
     department_ = None
+    teacher_selected = None
 
     layout = [  
-                [sg.Combo(values=dep_found,readonly=True,expand_x=True,key='department',auto_size_text=True,enable_events=True,default_value='ANY')],
+                [sg.Combo(values=dep_found,readonly=True,expand_x=True,key='department',auto_size_text=True,enable_events=True,default_value='All')],
                 [sg.Button(name,size = (10,1)) for name in Day],
                 [sg.Button(name,size=(6,1),expand_x=True) for name in period],
-                [sg.Listbox(values=teachers,key = 'free_list',text_color='Green',expand_x=True,expand_y=True,size = (24,30),right_click_menu=['&Right',['Edit Data','Info','Exit']]),
-                 sg.Listbox(values=teachers,key = 'busy_list',text_color='Red',expand_x=True,expand_y=True,size = (24,30),right_click_menu=['&Right',['Edit Data','Info','Exit']])]
+                [sg.HorizontalSeparator()],
+                [sg.Text('Available Faculty',expand_x=True,justification='center',text_color='green',background_color=bg_b),
+                 sg.Text('Engaged Faculty',expand_x=True,justification='center',text_color='red',background_color=bg_b)],
+                [sg.Listbox(values=teachers,key = 'free_list',text_color='Green',expand_x=True,expand_y=True,size = (24,30),right_click_menu=['&Right',['Check Time Table','Edit Data','Info','Exit',]],no_scrollbar=True, enable_events=True,auto_size_text=True),sg.VSep(),
+                 sg.Listbox(values=teachers,key = 'busy_list',text_color='Red',expand_x=True,expand_y=True,size = (24,30),right_click_menu=['&Right',['Check Time Table','Edit Data','Info','Exit',]],no_scrollbar=True, enable_events=True,auto_size_text=True)],
+                [sg.Text('Click a teacher to view number of free periods',key='status',font = 'Defalt 10',expand_x=True,relief='sunken')]
                 ]
 
-    window = sg.Window('Substitution sheduler', layout,element_padding=0,scaling=2,icon='icon.ico')
+    window = sg.Window('Substitution Schedule Assistant', layout,element_padding=0,scaling=2,icon='icon.ico',margins=(0,0))
 
-    while True:             # Event Loop
-        event, values = window.read()
+    window.finalize()
+    active_day,active_period,department_ = 'Monday',1,'all'                                  #
+    window['Monday'].update(button_color=selected_color)                                      # ------> Set defalt day,prd to monday,first prd and update the lists
+    window['1'].update(button_color=selected_color)                                            #
+    active_day_index = int(Day.index(active_day))                                               #
+    active_period_num = int(active_period)                                                       #
+                                                                                                         
+    free_teach = is_free(data,active_period_num,active_day_index,department_)[0]                  #
+    busy_teach = is_free(data,active_period_num,active_day_index,department_)[-1]                  #
+    window['free_list'].update(values=free_teach)                                                   #
+    window['busy_list'].update(values=busy_teach)                                                    #
+
+    
+    counter = 0
+    
+    while True:             # Event Loop  
+        counter += 1                                 #
+        if counter > 1:                              #
+            x = None                                 # ------> Initial one run to refresh lists
+        else:                                        #
+            x= 1                                     #
+        
+        event, values = window.read(timeout=x)
         if event in (None, 'Exit'):
             break
         if event == 'Info':
-            sg.popup('Made By Parth Sahni of class XII-E \n   completed on april 22 2023')
+            sg.popup('Substitution Schedule Assistant(v2) \n Made By Parth Sahni of class XII-E \n   completed on april 22 2023')
         if event == 'Edit Data':
              window.start_thread(lambda: os.system('Teacher_data.xlsx'), ('-THREAD-', '-THEAD ENDED-'))
         if event in Day:
@@ -63,15 +92,38 @@ if not error:
             department_= None
         if active_period != None and active_day != None and department_ != None:
             print(active_day,active_period,department_)
-            active_day_num = int(Day.index(active_day)+1)
+            active_day_index = int(Day.index(active_day))
             active_period_num = int(active_period)
             
-            free_teach = is_free(data,active_period_num,active_day_num,department_)[0]
-            busy_teach = is_free(data,active_period_num,active_day_num,department_)[-1]
+            free_teach = is_free(data,active_period_num,active_day_index,department_)[0]
+            busy_teach = is_free(data,active_period_num,active_day_index,department_)[-1]
             window['free_list'].update(values=free_teach)
             window['busy_list'].update(values=busy_teach)
+            
+        if event == 'free_list' and len(values['free_list']):
+            teacher_selected = values['free_list'][0]
+            num_free_prd = find_free_periods_num(data,active_day_index,teacher_selected)[0]
+            window['status'].update(teacher_selected+' has '+str(num_free_prd)+' free period(s) on '+active_day)
+            
+            print(teacher_selected+' has '+str(num_free_prd)+' free period(s) on '+active_day)
+            
+        if event == 'busy_list' and len(values['busy_list']):
+            teacher_selected = values['busy_list'][0].split('-')[0].strip()
+            num_free_prd = find_free_periods_num(data,active_day_index,teacher_selected)[0]
+            
+            window['status'].update(teacher_selected+' has '+str(num_free_prd)+' free period(s) on '+active_day)
+            
+            print(teacher_selected+' has '+str(num_free_prd)+' free period(s) on '+active_day)
+            
+        if event == 'Check Time Table':
+            if teacher_selected != None:
+                time_t = find_free_periods_num(data,active_day_index,teacher_selected)[-1]
+                popup_table(time_t,teacher_selected,active_day)
+            else:
+                sg.popup('Select a teacher first')
+            
 
     window.close()
-    
+ 
 else:
     sg.popup(error)
