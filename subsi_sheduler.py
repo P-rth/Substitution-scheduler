@@ -40,12 +40,16 @@ if not error:
                 [sg.HorizontalSeparator()],
                 [sg.Text('Available Faculty',expand_x=True,justification='center',text_color='green',background_color=bg_b),
                  sg.Text('Engaged Faculty',expand_x=True,justification='center',text_color='red',background_color=bg_b)],
-                [sg.Listbox(values=teachers,key = 'free_list',text_color='Green',expand_x=True,expand_y=True,size = (24,30),right_click_menu=['&Right',['Check Time Table','Edit Data','Info','Exit',]],no_scrollbar=True, enable_events=True,auto_size_text=True),sg.VSep(),
-                 sg.Listbox(values=teachers,key = 'busy_list',text_color='Red',expand_x=True,expand_y=True,size = (24,30),right_click_menu=['&Right',['Check Time Table','Edit Data','Info','Exit',]],no_scrollbar=True, enable_events=True,auto_size_text=True)],
+                [sg.Listbox(values=teachers,key = 'free_list',text_color='Green',expand_x=True,expand_y=True,size = (24,27),right_click_menu=['&Right',['Check Time Table','Edit Data','Info','Exit',]],no_scrollbar=True, enable_events=True,auto_size_text=True),sg.VSep(),
+                 sg.Listbox(values=teachers,key = 'busy_list',text_color='Red',expand_x=True,expand_y=True,size = (24,27),right_click_menu=['&Right',['Check Time Table','Edit Data','Info','Exit',]],no_scrollbar=True, enable_events=True,auto_size_text=True)],
                 [sg.Text('Click a teacher to view number of free periods',key='status',font = 'Defalt 10',expand_x=True,relief='sunken')]
                 ]
 
-    window = sg.Window('Substitution Schedule Assistant', layout,element_padding=0,scaling=2,icon='icon.ico',margins=(0,0))
+    my_width, my_height = 1920,1080                                                                                                            #
+    scaling_old = 2.3                                                                                                                          #
+    width, height = sg.Window.get_screen_size()                                                                                                # -------> Set optimal program scaling w.r.t. the screen
+    scaling = scaling_old * min(width / my_width, height / my_height)                                                                          #
+    window = sg.Window('Substitution Schedule Assistant', layout,element_padding=0,scaling=scaling,icon='icon.ico',margins=(0,0))              
 
     window.finalize()
     active_day,active_period,department_ = 'Monday',1,'all'                                  #
