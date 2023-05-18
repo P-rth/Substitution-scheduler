@@ -21,7 +21,7 @@ def popup_table(list_in,name,day):
         [sg.Button('Ok')]
     ]
     sg.theme('SandyBeach')
-    window = sg.Window('Title', layout,margins=(0,0),element_padding=(0,0),size = (250,350),element_justification='Center')
+    window = sg.Window('Title', layout,margins=(0,0),element_padding=(0,0),size = (250,360),element_justification='Center')
     while True:
         event, values = window.read()
         if event in (sg.WIN_CLOSED,'Ok'):
@@ -53,7 +53,10 @@ def read_data(exel_file_path):
             for i in cell:
                 x = []
                 for j in i:
-                    x.append(j.value)
+                    j = j.value
+                    if j:
+                        j = j.replace(" ", "").upper()
+                    x.append(j)
                 array.append(x)
         
             array.append([teacher,department])
@@ -63,10 +66,30 @@ def read_data(exel_file_path):
         
     return(data,error)
 
-def is_free(data,prd,day,dep_req):
+def exec_class_fix(exec_class):
+    exec_class = exec_class.split(',')
+    for i in exec_class:
+        if i.strip().isalnum():
+            k = exec_class.index(i)
+            exec_class[k] = exec_class[k].upper().strip()
+        elif i.strip() == '' or i == 'UNAVBL CLS':
+            continue
+        else:
+            sg.popup_error(f'Unavailable class "{i}" is not in correct format \n\n correct format : 9A,5b,6c... \n (class names seprated by commas - not case sensitive)')
+            break
+    return(exec_class)
+
+
+def is_free(data,prd,day,dep_req,exec_class = ''):
     out = []
     out_busy = []
+    exec_class = exec_class_fix(exec_class)
+        
+            
     for array in data:
+        class_sel = array[prd-1][day]
+        if class_sel:
+            class_sel = class_sel.upper()
         teacher = array[-1][0]
         department = array[-1][1]
         if array[prd-1][day] == None:
@@ -75,9 +98,15 @@ def is_free(data,prd,day,dep_req):
         else:
             if dep_req != 'All':
                 if dep_req == department:
-                    out_busy.append(str(teacher+' - Busy with '+array[prd-1][day]))
+                    if class_sel not in exec_class:
+                        out_busy.append(str(teacher+' - Busy with '+class_sel))
+                    else:
+                        out.append(f'{teacher}: {class_sel} unavailable')
             else:
-                out_busy.append(str(teacher+' - Busy with '+array[prd-1][day]))
+                if class_sel not in exec_class:
+                        out_busy.append(str(teacher+' - Busy with '+class_sel))
+                else:
+                        out.append(f'{teacher}: {class_sel} unavailable')
                 
     return(out,out_busy)
 
@@ -89,7 +118,8 @@ def find_departments(data):
     return(out)
     
     
-def find_free_periods_num(data,day,teacher):
+def find_free_periods_num(data,day,teacher,exec_class=''):
+    exec_class = exec_class_fix(exec_class)
     tt = []
     counter = 0
     for i in data:
@@ -98,7 +128,7 @@ def find_free_periods_num(data,day,teacher):
                 tt.append(j[day])
             break
     for i in tt:
-        if i == None:
+        if i == None or i in exec_class:
             counter += 1
     return(counter,tt)
             
