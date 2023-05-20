@@ -72,5 +72,5 @@ Here you can adjust scaling of the program and choose from 150+ themes available
 # the ⓘ icons
 these icon have information regarding the window they are on because most people are not gonna read this documentation lol
 
-# and that's all for now! :)
+# that's all for now! :)
 Made with <3 by Parth Sahni Using PySimpleGUI
