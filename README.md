@@ -16,25 +16,32 @@ Basically A GUI program that takes in a excel file and tells what teacher is fre
 ##
 
 ## First start & intro :
-When you start the program for the first time It will ask for a data file to read from :![enter image description here](https://i.ibb.co/1qynKs0/image.png)
+When you start the program for the first time It will ask for a data file to read from :
+
+![enter image description here](https://i.ibb.co/1qynKs0/image.png)
+
 Here you can select the excel file with the containing all the teacher data by either clicking the 'browse' button or entering a path. The excel file should be in in a proper format to be read by the software.
 once the file is opened it  is copied into the program's directory named 'Teacher_data.xlsx' for convenience
 
 
 After Selecting a valid data file a window like this will open up :
 
-![enter image description here](https://i.ibb.co/2FsS78F/Screenshot-2023-05-21-005236.png)
+![select file dialog](https://i.ibb.co/2FsS78F/Screenshot-2023-05-21-005236.png)
 
 This window consists of many things:
 
 (1) : The department filter  : use this to show teachers of only a certain department
+
 (2) : Day & Period selector : Select a day and period to show the status of faculty at
+
 (3) : Available Faculty : list of all the teachers free at the selected day and period
+
 (4) : Engaged Faculty : list of all the teachers Busy and with whom at the selected day and period
+
 (5) : Status bar : Click on any teacher to view number of free periods for that teacher here
  
  these are all the things that you see when you open up the window
- when do some interaction,there are some more sub-windows that show up :
+ with some interaction, there are some more sub-windows that show up:
  
 
 ## 1. Right click menu :
@@ -60,7 +67,7 @@ Using this feature you can select a number of classes and give them the status o
 ## 1.4 Preferences :
 ![prefrences window](https://i.ibb.co/J2DW8Zy/image.png)
 
-Here you can scaling of the program and choose from 150+themes available
+Here you can adjust scaling of the program and choose from 150+ themes available. These prefrences are saved in the "ss.config" file
 
 # the ⓘ icons
 these icon have information regarding the window they are on because most people are not gonna read this documentation lol
