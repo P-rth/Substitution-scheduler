@@ -1,37 +1,48 @@
 import openpyxl
 import PySimpleGUI as sg
 
-def popup_table(list_in,name,day):
-    list = []
-    for i in list_in:
-        if i == None:
-            list.append('-')
-        else:
-            list.append(i)
-    layout = [[sg.Text(name)],[sg.Text(day)],
-        [sg.Table([[1,list[0]], 
-                   [2,list[1]],
-                   [3,list[2]],
-                   [4,list[3]],
-                   [5,list[4]],
-                   [6,list[5]],
-                   [7,list[6]],
-                   [8,list[7]],], 
-                  ['Period','Class'], num_rows=2,expand_x=True,expand_y=True,hide_vertical_scroll=True,justification = "center",row_height=28)],
-        [sg.Button('Ok')]
+
+
+
+def pref_popup(scale_old = 2.3 , theme_old = 'SandyBeach'):
+    scale_ = scale_old
+    theme_ = theme_old
+    layout = [
+        [sg.Text('Scale :'),sg.Slider((5,50), orientation='h',default_value = scale_old*10,key = 'scale')],
+        [sg.Text('Theme :'),sg.Combo(sg.theme_list(),default_value = theme_old,key = 'theme')],
+        [sg.Button('Ok',border_width=0,font='Calibri 10'),sg.Push(),sg.Button('Preview themes',border_width=0,font='Calibri 10'),sg.Button('Defalt',border_width=0,font='Calibri 10')]
     ]
-    sg.theme('SandyBeach')
-    window = sg.Window('Title', layout,margins=(0,0),element_padding=(0,0),size = (250,360),element_justification='Center')
+
+    window = sg.Window('Title', layout)
+
     while True:
         event, values = window.read()
-        if event in (sg.WIN_CLOSED,'Ok'):
+        if event == sg.WIN_CLOSED:
             break
-    
+        if event == 'Defalt':
+            window['scale'].update(23)
+            window['theme'].update('SandyBeach')
+            
+            
+        if event == 'Ok':
+            scale_ = values['scale']/10
+            theme_ = values['theme']
+            f = open("ss.config", "w")
+            f.write(f'{scale_},{theme_}')
+            f.close()
+            window.close()
+            
+        if event == 'Preview themes':
+            sg.theme_previewer(4,scrollable = True)
+            
+
+            
     window.close()
+    return(scale_,theme_)
 
 
 def test_data(data):
-    for i in data:
+    for i in data[0]:
         for j in i:
                 print(j)
         print('#####################')
@@ -62,12 +73,12 @@ def read_data(exel_file_path):
             array.append([teacher,department])
             data.append(array)
         except:
-            error = 'Error there is no Department mentioned in the sheet title : \n\n'+str(sheet)[12:-2]+'\n of file '+exel_file_path+'\n\n The correct way to title : teacher_name,Department'+'\n\n The program will exit now.'
+            error = 'Error while reading: \n\n'+str(sheet)[12:-2]+'\n of file '+exel_file_path+'\n\nPlease check the format'+'\n\n The program will exit now.'
         
     return(data,error)
 
-def exec_class_fix(exec_class):
-    exec_class = exec_class.split(',')
+    
+    window.close()
     for i in exec_class:
         if i.strip().isalnum():
             k = exec_class.index(i)
@@ -80,10 +91,10 @@ def exec_class_fix(exec_class):
     return(exec_class)
 
 
-def is_free(data,prd,day,dep_req,exec_class = ''):
+def is_free(data,prd,day,dep_req,exec_class = []):
     out = []
     out_busy = []
-    exec_class = exec_class_fix(exec_class)
+    exec_class = exec_class
         
             
     for array in data:
@@ -117,27 +128,44 @@ def find_departments(data):
             out.append(array[-1][1])
     return(out)
     
+def strike(text):
+    return ''.join([u'\u0336{}'.format(c) for c in text])
     
-def find_free_periods_num(data,day,teacher,exec_class=''):
-    exec_class = exec_class_fix(exec_class)
+    
+def find_free_periods_num(data,day,teacher,exec_class=[]):
     tt = []
     counter = 0
     for i in data:
         if i[-1][0] == teacher:        #last row of data , first coulm (name)
             for j in i[0:-1]:           #to remove name from the timetable while looking for free prd
-                tt.append(j[day])
+                if j[day] not in exec_class:
+                    tt.append(j[day])
+                else:
+                    tt.append(strike(f'{j[day]} '))
             break
     for i in tt:
         if i == None or i in exec_class:
             counter += 1
     return(counter,tt)
             
-     
-
-    
 
 
+import re                                                                           #
+def natural_sort(l):                                                                 #
+    convert = lambda text: int(text) if text.isdigit() else text.lower()             # Natural sort function
+    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]       # idk how but it just works
+    return sorted(l, key=alphanum_key)                                               # https://t.ly/JLUU stackoverflow copied code
+                                                                                    #
+
+def find_classes(data):
+    cls_found = []              # to look at output not error
+    for i in data:
+        for j in i[0:-1]:
+            for k in j:      #to remove name from the timetable
+                if k != None:
+                    if k not in cls_found:               # to add only if not already present
+                        cls_found.append(k)
+
+    return(natural_sort(cls_found))
 
 
-#data = read_data('Book1.xlsx')           
-#is_free(data,4,5,'sports')
