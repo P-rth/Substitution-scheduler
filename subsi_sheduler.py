@@ -86,6 +86,9 @@ if not error:
         window['busy_list'].update(values=busy_teach)
         return(window)
 
+
+    scale_conf = None
+    theme = None
     if config:
         scale_conf = float(config[0])
         theme = config[1]
@@ -175,11 +178,18 @@ if not error:
                 sg.popup('Select a teacher first')
                 
         if event == 'Preferences':
-            scale1,theme1 = pref_popup(scale_conf,theme)
-            if scale1 != scale_conf or theme1 != theme:
-                scale_conf = scale1
-                theme = theme1
-                make_window(scale1,theme1,)
+            if scale_conf and theme:
+                scale1,theme1 = pref_popup(scale_conf,theme)
+                
+                if scale1 != scale_conf or theme1 != theme:
+                    scale_conf = scale1
+                    theme = theme1
+                    make_window(scale1,theme1,)
+                
+            else:
+                scale_conf,Theme = pref_popup()
+                make_window(scale_conf,Theme)
+                
             
 
     window.close()

@@ -17,8 +17,10 @@ def pref_popup(scale_old = 2.3 , theme_old = 'SandyBeach'):
 
     while True:
         event, values = window.read()
+
         if event == sg.WIN_CLOSED:
             break
+        
         if event == 'Defalt':
             window['scale'].update(23)
             window['theme'].update('SandyBeach')
