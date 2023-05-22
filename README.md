@@ -1,6 +1,6 @@
 
 # Substitution-scheduler
-A program to help with sheduling Substitutions in schools
+A program to help with sheduling substitutions in schools
 
 ##
 
