@@ -1,7 +1,6 @@
 
 # Substitution-scheduler
-Basically A GUI program that takes in a excel file and tells what teacher is free in a specific period of specific day but Does MUCH more than that
-
+A program to help with sheduling Substitutions in schools
 
 ##
 
