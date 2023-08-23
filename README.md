@@ -130,9 +130,9 @@ one sheet of the excel file only contains the time table for one teacher
 	read but helps in organising the sheets
 
 ### Example Data Files
-[Template](https://filebin.net/i8kdp7j1ldd3w2gk/Teacher_data_template.xlsx)
+[Template](https://github.com/P-rth/Substitution-scheduler/raw/main/Teacher_data_Template.xlsx)
 
-[Example File](https://filebin.net/i8kdp7j1ldd3w2gk/Teacher_data.xlsx)
+[Example File](https://github.com/P-rth/Substitution-scheduler/raw/main/Teacher_data.xlsx)
 
 
 > Made with ❤ by Parth Sahni Using PySimpleGUI
