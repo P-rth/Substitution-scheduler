@@ -9,11 +9,12 @@ A program to help with scheduling substitutions in schools
 1. Real time updates based on what options you selected.
 2. Customizable theme and scaling.
 3. All data saved in excel format 
-4. Set unavailable classes.
-5. status bar with number of free period display
-6. check time table of a teacher
+4. Set unavailable classes / Teachers.
+5. number of free period display with information on where teacher is busy / is free
+6. click on teacher to check time table
 7. filter needed teachers by department
 8. very user-friendly
+9. Universal search including (name / class / number of free periods /is Free?/is Unavailable?)
 ##
 
 ## First start & intro :
