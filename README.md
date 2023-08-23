@@ -1,6 +1,6 @@
 
 
-# Substitution-scheduler
+# Substitution-schedule-assistant
 A program to help with scheduling substitutions in schools
 
 ##
