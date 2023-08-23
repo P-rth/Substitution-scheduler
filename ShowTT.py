@@ -1,52 +1,97 @@
 from pyxl import *
 info_icon = b'iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAB+0lEQVRIia3Wv2tTURQH8E9DBgcpAbWEDCWISCni4KCOUjAGNx1FioODqw4dHPwHHKSDiIiCi9XBTUWIoAiiCCIKFkGdtT/E34ikosO98T3jfS9a84VwX84753vOvff8eCPKMY4W9mALxlDBMubRwU28HMDzB+o4jSX8GPB7h4topohGErIWzuYMVnAXD/E67mADtmEX1kS9NziKy2WRH8TXGNknnESjRH89TuBttPmGY0XKU/gSFV9ge4y2HynZJB5H2y4O9CvU8SpHvilB0sAcrkfnqfePIsdCP8es7Fh2JozhvOxinxTsZEKWGHN5zwtROFtgSMiUnoNnqBboHY86H6JD01HwXUGq5aK7LZx1u0SvJrvLmXxk90qM/hVXI2enKmQAIc/LsBdb4/MiLpTo3sd+TFaF8ifkchn24XB8fjrAwfu4jhZd6NDQa1ywboi8tbh+rAhdkXTxrBY74jpfEVouocCaQyCvydK4U8EtISsqQjf833s5grX4jGs94SmDW8U5v7eKFDbLWsWVfLBjBje7tlCZMziUeF+XNbulFEdLNgvK2nUKEznyrjBXkpi2uoHTO5auvoGTGpltYWSOx/8ruIMHsmofFVJxSjYyF4UkuVQS0C80cEY2Cv9m6G9MEaV2kEdTuJvdwmdLPcqX8VyooRtKPlt+Aq3Ck3SHsl/0AAAAAElFTkSuQmCC'
 
-def popup_table(name,day,data,exec_class,scaling_delta = 1):
-   
-    Day_list = ['Monday','Tuesday','Wednesday','Thursday','Friday']
-    day_index = Day_list.index(day)
-    time_t = find_free_periods_num(data,day_index,name,exec_class)[-1]
-    bg = sg.theme_background_color()
+def rotate(l):
+    out = []
+    for i in range(len(l[0])) :
+        temp = []
+        for j in range(len(l)):
+            temp.append(l[j][i])
+        out.append(temp)
 
-    def format_t(t=time_t):
+    return(out)
+
+def format_t(t):
         list2 = []
-        for i in time_t:
+        for i in t:
             if i == None:
                 list2.append('-')
             else:
                 list2.append(i)
-        out = []
-        for i in range(len(list2)):
-            x = []
-            x.extend([i+1,list2[i]])
-            out.append(x)
-        return(out)
-                   
-               
-    layout = [  [sg.Text(name,background_color=sg.theme_background_color())],
-                [sg.Combo(Day_list,default_value = day,key = 'dayselect',readonly=True,enable_events=True)],
+        return(list2)
+
+
+def popup_table_layout(scaling,theme,starting_size_1,scale_var):
+    defalt_size = (round(starting_size_1[0]*scale_var),round(starting_size_1[1]*scale_var))
+    bg = sg.theme_background_color()
+    Day_list = ['Monday','Tuesday','Wednesday','Thursday','Friday']
+    layout = [  [sg.Text('Teacher Name',background_color=bg,key='teach_name')],
                 [sg.Table(
-                    format_t(), 
-                    ['Period','Class'],key='table', num_rows=8,expand_x=True,expand_y=True,hide_vertical_scroll=True,justification = "center",row_height=28,pad=(5,5)
+                    [[],[],[],[],[],[],[],[]], 
+                    ['Period','Mon','Tue','Wed','Thu','Fri'],key='table',enable_click_events=True,enable_events=True,num_rows=8,expand_x=True,expand_y=True,vertical_scroll_only = False,hide_vertical_scroll=True,justification = "center",auto_size_columns=True,pad=(5,5),alternating_row_color=sg.theme_progress_bar_color()[1]
                     )
-                ],
-                [sg.Button('Ok',border_width=0,font = 'Calibri 8',size = (3,1)),sg.Push(),sg.Button(image_data=info_icon,border_width=0, button_color=(bg, bg),key = '?')]
+                ],  
     ]
-    window = sg.Window('Check TT', layout,margins=(0,0),element_justification='Center',element_padding = (20,5))
-    while True:
-        event, values = window.read()
-        if event in (sg.WIN_CLOSED,'Ok'):
-            break
-        if event == 'dayselect':
-            if values['dayselect'] != day:
-                day = values['dayselect']
-                day_index = Day_list.index(day)
-                time_t = find_free_periods_num(data,day_index,name,exec_class)[-1]
-                window['table'].update(format_t())
-        if event == '?':
-            sg.popup("Check the teacher's time Table for the selected day or any other day of the week. Crossed out classes mean the class is unavailable")
-                
-            
-            
-    window.close()
+    layout1 = [
+               [sg.VPush()],
+               [sg.Checkbox(Day_list[0],disabled=True,enable_events=True)],
+               [sg.Checkbox(Day_list[1],disabled=True,enable_events=True)],
+               [sg.Checkbox(Day_list[2],disabled=True,enable_events=True)],
+               [sg.Checkbox(Day_list[3],disabled=True,enable_events=True)],
+               [sg.Checkbox(Day_list[4],disabled=True,enable_events=True)],
+               [sg.VPush()],
+               [sg.Push(),sg.Button(image_data=info_icon,border_width=0, button_color=(bg, bg),key = '?_tt')],
+               ]
+    
+    col = sg.Column([[sg.Frame('Set Unavailable',layout1,expand_x=True,expand_y=True)]],expand_x=True,expand_y=True)
+    col1 = sg.Col([[sg.Frame('Time Table',layout,element_justification='Center',expand_x=True,expand_y=True)]],expand_x=True,expand_y=True)
+    test_layout = [[sg.Pane([col,col1],orientation='h',relief=None,expand_x=True,expand_y=True)]
+                   ]
+    window = sg.Window('Check TT', test_layout,keep_on_top=True,element_padding=(1,1),margins=(5,5),element_justification='Center',resizable=True,finalize = True,grab_anywhere = True,scaling=scaling,size=defalt_size)
+    return(window)
+
+
+
+def popup_table_update(name,day,data,exec_class,window,exec_teach_raw = {}):
+
+    out1 = []
+    out = []
+    table_data = []
+
+    Day_list = ['Monday','Tuesday','Wednesday','Thursday','Friday']
+    day_index = Day_list.index(day)
+    time_t = find_free_periods_num(data,day_index,name,exec_class)[-1]
+    window['teach_name'].update(name)
+    
+    for i in range(5):
+        window[i].update(disabled=False)
+
+    
+
+    for i in range(5):
+        time_t = find_free_periods_num(data,i,name,exec_class)[-1]
+        out.append(format_t(time_t))
+    #print(out)
+    table_data = rotate(out)  
+    for i in range(8):
+        out1 += [[str(i+1)]+table_data[i]]
+
+    window['table'].Update(out1)
+    
+
+    print(exec_teach_raw)
+
+    if name in list(exec_teach_raw.keys()):
+        for i in range(len(exec_teach_raw[name])):
+            print(i)
+            if exec_teach_raw[name][i]:
+                window[i].Update(value = True)
+            else:
+                window[i].Update(value = False)
+    else:
+        for i in range(5):
+            window[i].Update(value = False)
+
+
+    return(out,table_data)
     
