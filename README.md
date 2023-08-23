@@ -1,6 +1,7 @@
 
+
 # Substitution-scheduler
-A program to help with sheduling substitutions in schools
+A program to help with scheduling substitutions in schools
 
 ##
 
@@ -23,7 +24,9 @@ once the file is opened it  is copied into the program's directory named 'Teache
 
 After Selecting a valid data file a window like this will open up :
 
-![enter image description here](https://i.ibb.co/2FsS78F/Screenshot-2023-05-21-005236.png)
+# Main Window
+
+![enter image description here](https://i.ibb.co/JQ5JqNL/Untitled.png)
 
 This window consists of many things:
 
@@ -32,7 +35,36 @@ This window consists of many things:
 ### (3) : Available Faculty : list of all the teachers free at the selected day and period
 ### (4) : Engaged Faculty : list of all the teachers Busy and with whom at the selected day and period
 ### (5) : Status bar : Click on any teacher to view number of free periods for that teacher here
- 
+### (6) : Search Bar : Search for teachers by name / class / number of free periods /is Free?/is Unavailable?
+
+## Search Bar Tricks :
+
+To find Teacher By name : Enter Name
+
+To find Teacher By Class : Enter Class
+
+To find Teacher By number of free periods : Enter Number
+
+To find Teacher By is Free? : Enter `"Free"`
+
+To find Teacher By is Unavailable? : Enter the exclamation Mark(`'!'`)
+
+
+# Child Window (Time Table view)
+![enter image description here](https://i.ibb.co/PDNbmQj/sddf.png)
+
+### (7) : Set unavailable : to make selected teacher not show up in free list (On selected days & Even If the Teacher has a free prd).
+
+This Is the Time-Table window where when you click a teachers name in the main window, the time table gets displayed. The cells with ('`-`') means the teacher has not been assigned a period / Is free.\
+Crossed out classes mean the class is unavailable.\
+To copy the time table for a day click the respective name of the day.\
+To copy time table by period click on the respected row.
+
+
+### 
+
+___
+
  ### these are all the things that you see when you open up the window. When do some interaction, there are some more sub-windows that show up :
  
 
@@ -42,9 +74,7 @@ This window consists of many things:
 
 ## 1.1. Check Time Table :
 
-Check the teacher's time Table for the selected day or any other day of the week
-
-![enter image description here](https://i.ibb.co/xhWcRwy/image.png)
+Obsolete option -- use the child window to look at time-table of teachers
 
 ## 1.2. Edit Data :
 
@@ -105,15 +135,3 @@ one sheet of the excel file only contains the time table for one teacher
 
 
 > Made with ❤ by Parth Sahni Using PySimpleGUI
-
-
-
-	
-
-
-
- 
-
- 
-
-
