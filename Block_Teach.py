@@ -49,4 +49,15 @@ def popup_table(name,day,data,exec_class,scaling_delta = 1):
             
             
     window.close()
+
+    for i in exec_class:
+        if i.strip().isalnum():
+            k = exec_class.index(i)
+            exec_class[k] = exec_class[k].upper().strip()
+        elif i.strip() == '' or i == 'UNAVBL CLS':
+            continue
+        else:
+            sg.popup_error(f'Unavailable class "{i}" is not in correct format \n\n correct format : 9A,5b,6c... \n (class names seprated by commas - not case sensitive)')
+            break
+    return(exec_class)
     

@@ -2,6 +2,41 @@ import openpyxl
 import PySimpleGUI as sg
 from collections import OrderedDict
 from numpy import argsort
+import re
+import csv
+
+def csvread():
+    rows = []
+    try:
+        with open('data_config', 'r') as csvfile:
+            csvreader = csv.reader(csvfile,delimiter=':')
+        
+            for row in csvreader:
+                if row != []:                #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                    rows.append(row)                             #to fix windows adding blank lines in between
+            if rows != []:                   #<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+                return rows
+            else:
+                return None
+    except:
+        return None
+ 
+
+def csvwrite(set_list):
+    # writing to csv file
+    with open('data_config', 'w') as csvfile:
+        csvwriter = csv.writer(csvfile,delimiter=':')
+
+        csvwriter.writerows(set_list)
+
+def validip(ip):
+    valid = False
+    try:
+        ip = ipaddress.ip_address(ip)
+        valid = True
+    except:
+        pass
+    return valid
 
 def testwindow():
     layout = [
@@ -16,6 +51,14 @@ def testwindow():
             break
 
     window.close()
+
+
+def find_teach(data):
+    teachers = []
+    for blocks in data:
+        teachers.append(blocks[-1][0])
+    return teachers
+
 
 def pref_popup(scale_old = 2.3 , theme_old = 'SandyBeach'):
     scale_ = scale_old
@@ -56,12 +99,20 @@ def pref_popup(scale_old = 2.3 , theme_old = 'SandyBeach'):
     return(scale_,theme_)
 
 
-def test_data(data):
-    for i in data[0]:
-        for j in i:
-                print(j)
-        print('#####################')
+def test_data(data,chunk=False):
+    for i in data:
+        if chunk == False:
+            for j in i:
+                    print(j)
+            print('#####################')
+        else:
+            print(i)
     print('$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$')
+
+
+
+def remove_non_alphanumeric(text):
+  return re.sub(r'[^A-Za-z0-9 ]+', '', text)
 
 def read_data(exel_file_path):
     data = []
@@ -85,9 +136,8 @@ def read_data(exel_file_path):
                     x.append(j)
                 array.append(x)
 
-            teacher = teacher.title()
-            if teacher[-1] != '.':
-                teacher = teacher +'.'
+            teacher = remove_non_alphanumeric(teacher).title()
+
 
             array.append([teacher,department])
             data.append(array)
@@ -96,18 +146,6 @@ def read_data(exel_file_path):
         
     return(data,error)
 
-    
-    window.close()
-    for i in exec_class:
-        if i.strip().isalnum():
-            k = exec_class.index(i)
-            exec_class[k] = exec_class[k].upper().strip()
-        elif i.strip() == '' or i == 'UNAVBL CLS':
-            continue
-        else:
-            sg.popup_error(f'Unavailable class "{i}" is not in correct format \n\n correct format : 9A,5b,6c... \n (class names seprated by commas - not case sensitive)')
-            break
-    return(exec_class)
 
 
 
@@ -116,18 +154,20 @@ def format_list_out(name1,tclass=' ',freeprd = ' '):
     name1 = str(name1)
     tclass = str(tclass)
 
-    if len(name1) < 20:
-        name1 += ' '*(20-len(name1))
+    if len(name1) < 30:
+        name1 += ' '*(30-len(name1))   #If less than 5 fill
 
-    name1 = name1[0:18]
+    name1 = name1[0:30]              #If more that 25 cut off
 
-    if len(tclass) < 8:
-        tclass += ' '*(8-len(tclass))
 
-    tclass = tclass[0:7]
+    if len(tclass) < 5:
+        tclass += ' '*(5-len(tclass))  
 
-    return(f'{name1} : {tclass} : {freeprd}')      # 18:7:...
+    tclass = tclass[0:5]               #If more that 5 cut off
+
+    return(f'{name1}: {tclass}: {freeprd}')      # 18:7:...          #27 char total (minimum size)       defalt
         
+
 def unformat_list(mylist):
     out = []
     for i in mylist:
@@ -193,19 +233,19 @@ def is_free(data,prd,day,dep_req,exec_class = [],exec_teach_raw = {}):    #exec_
     sorted_value_index1 = argsort(values1)[::-1]
     sorted_dict_busy = {keys1[i]: values1[i] for i in sorted_value_index1}   
 
-
     return(sorted_dict_free,sorted_dict_busy)
 
 
 
-def find_departments(data):
-    out = []
+def find_departments(data,withteach=False):
+    out = set()
     for array in data:
-        if not array[-1][1] in out:
-            out.append(array[-1][1])
-    return(out)
+        if withteach:
+            out.add(tuple(array[-1]))
+        else:
+            out.add(array[-1][1])
+    return(list(out))
     
-
     
     
 def find_free_periods_num(data,day,teacher,exec_class=[]):
@@ -244,4 +284,12 @@ def find_classes(data):
 
     return(natural_sort(cls_found))
 
+def rotate(l):
+    out = []
+    for i in range(len(l[0])) :
+        temp = []
+        for j in range(len(l)):
+            temp.append(l[j][i])
+        out.append(temp)
 
+    return(out)

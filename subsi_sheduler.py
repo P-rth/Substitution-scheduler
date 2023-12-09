@@ -12,7 +12,19 @@ import PySimpleGUI as sg
 
 import pyperclip
 
+from load_data import read_data_popup
+
+
 empty_img = image_data = b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08\x06\x00\x00\x00\x1f\x15\xc4\x89\x00\x00\x00\rIDATx\x9cc````\x00\x00\x00\x05\x00\x01\xa5\xf6E@\x00\x00\x00\x00IEND\xaeB`\x82'
+
+
+
+data = read_data_popup()
+if data == None:
+    error = "No data source selected"
+else:
+    error = False
+    data = tuple(data) #make data immutatable
 
 
 font_installed = False
@@ -56,25 +68,12 @@ except:
     config = None
 
 
-try:
-    data,error = read_data('Teacher_data.xlsx')
-except:
-    data_path = sg.popup_get_file('Data file not found Please select manually:',keep_on_top=True,no_titlebar=True,file_types=((('Exel Teacher time-table data file', 'xlsx'),)))
-    print(data_path)
-    if data_path != None and data_path.strip() != '':
-        shutil.copy(data_path, 'Teacher_data.xlsx', follow_symlinks=True)
-        data,error = read_data('Teacher_data.xlsx')
-    else:
-        sg.popup('Blank Path selected, Exiting!')
-        exit()  
-        
-data = tuple(data) #make data immutatable
-    
-dep_found=find_departments(data)+['All']
 
 update_s = False
 
 if not error:
+
+    dep_found=find_departments(data)+['All']
     
     out = []
     out1 = []
@@ -107,14 +106,14 @@ if not error:
         sg.theme(theme)
         bg = sg.theme_background_color()
         bg_b = sg.theme_element_background_color()
-        R_click_m = ['&Right',['More Info','Edit Data','Select unavalible classes','Preferences','Exit',]]
+        R_click_m = ['&Right',['Select unavailable classes','Preferences','Exit',]]
         
         layout = [  
                     [sg.Combo(values=dep_found,readonly=True,expand_x=True,key='department',auto_size_text=True,enable_events=True,default_value='All')],
 
-                    [sg.Button(name,size = (10,1),expand_x=True) for name in Day],
+                    [sg.Button(name,size = (9,1),expand_x=True) for name in Day],
 
-                    [sg.Button(name,size=(6,1),expand_x=True) for name in period],
+                    [sg.Button(name,size=(1,1),expand_x=True) for name in period],
 
                     [
                         sg.Input(do_not_clear=True, size=(20,1),enable_events=True, key='_INPUT_FIND_TEACH_',expand_x=True),
@@ -126,18 +125,17 @@ if not error:
                     [sg.Text('Available Faculty',expand_x=True,justification='center',text_color='green',background_color=bg_b),
                     sg.Text('Engaged Faculty',expand_x=True,justification='center',text_color='red',background_color=bg_b)],
 
-                    [sg.Listbox(values=teachers,font = ('roboto mono',9),key = 'free_list',text_color='Green',expand_x=True,expand_y=True,size = (27,16), enable_events=True,auto_size_text=True),sg.VSep(),
-                    sg.Listbox(values=teachers,font = ('roboto mono',9),key = 'busy_list',text_color='Red',expand_x=True,expand_y=True,size = (27,16), enable_events=True,auto_size_text=True)],
+                    [sg.Listbox(values=teachers,font = ('roboto mono',9),key = 'free_list',text_color='Green',expand_x=True,expand_y=True,size = (40,20), enable_events=True,auto_size_text=True),sg.VSep(),
+                    sg.Listbox(values=teachers,font = ('roboto mono',9),key = 'busy_list',text_color='Red',expand_x=True,expand_y=True,size = (40,20), enable_events=True,auto_size_text=True)],
 
                     [sg.Text(' ',key='status',border_width = 0,expand_x=True),sg.Button(image_data=info_icon,border_width=0, button_color=(bg, bg),key = 'Info')]
                     ]
 
-                                                                                      #
-        defalt_size = (round(starting_size[0]*scale_var),round(starting_size[1]*scale_var))
-        print(defalt_size)
+
         window = sg.Window('Substitution Schedule Assistant',layout,auto_size_text=True,element_padding=0,scaling=scaling_delta*scaling,icon='icon.ico',margins=(1,1),resizable=True,right_click_menu=R_click_m)
         window.finalize()
-        window.set_min_size((round(starting_size[0]*scale_var),round(232*scaling_delta)))          
+
+        window.set_min_size(window.size)     
 
                                                                                                 #
         window['Monday'].update(button_color=selected_color)                                      # ------> Set defalt day,prd to monday,first prd and update the lists
@@ -146,7 +144,7 @@ if not error:
         active_period_num = int(active_period)                                                       #
                                                                                                             
 
-        total_teach = len(is_free(data,1,1,'All')[0])+len(is_free(data,1,1,'All')[-1])
+        total_teach = len(find_teach(data))
         window['status'].update(f'Loaded {len(dep_found)} departments with {total_teach} teachers')
         print('Window Made')
         return(window)
@@ -184,7 +182,7 @@ if not error:
         if event in (None, 'Exit'):
             break
         if event == 'Info':
-            sg.popup('Substitution Schedule Assistant(v3.5) \nMade with <3 by Parth Sahni\n\nParthsahni09@gmail.com\ncompleted on 14/8/2023')
+            sg.popup('Substitution Schedule Assistant(v4) \nMade with <3 by Parth Sahni\n\nParthsahni09@gmail.com')
             try:
                 if win_os:
                     startfile("https://github.com/P-rth/Subtitution-scheduler")
@@ -204,7 +202,7 @@ if not error:
                 window.start_thread(lambda: system('xdg-open Teacher_data.xlsx'), ('-THREAD-', '-THEAD ENDED-'))
             
     
-        if event == 'Select unavalible classes':
+        if event == 'Select unavailable classes':
             mylist = find_classes(data)
             if exec_class != None:
                 old_exec = exec_class 
@@ -226,7 +224,6 @@ if not error:
             window[event].update(button_color=selected_color)
             active_period = event
 
-        
         if win == window:
             if values['department']:
                 department_ = values['department']
@@ -259,7 +256,7 @@ if not error:
             print(teacher_selected+' has '+str(num_free_prd)+' free period(s) on '+active_day)
          #  f_teach_name = unformat_list(list(free_teach.keys()))
          #   window['free_list'].set_vscroll_position(f_teach_name.index(teacher_selected)/len(free_teach))
-           # window.Element('busy_list').Update(busy_teach) #remove background from other list (intentional)
+            window.Element('busy_list').Update(busy_teach) #remove background from other list (intentional)
             out,table_data = popup_table_update(teacher_selected,active_day,data,exec_class,window2,exec_teach_raw)
             
         if event == 'busy_list' and len(values['busy_list']):
@@ -272,7 +269,7 @@ if not error:
             print(teacher_selected+' has '+str(num_free_prd)+' free period(s) on '+active_day)
          #   b_teach_name = unformat_list(list(busy_teach.keys()))
          #   window['busy_list'].set_vscroll_position(b_teach_name.index(teacher_selected)/len(busy_teach))
-            #window.Element('free_list').Update(free_teach) #remove background from other list (intentional)
+            window.Element('free_list').Update(free_teach) #remove background from other list (intentional)
             out,table_data = popup_table_update(teacher_selected,active_day,data,exec_class,window2,exec_teach_raw)
             
             
@@ -302,7 +299,8 @@ if not error:
                                 asd = asd+i+' '
                             print(asd)
                             pyperclip.copy(asd)
-                    else:
+                    elif event[2][0] != None:
+                        print(event)
                         print(table_data[event[2][0]])
                         asd = ''
                         for i in table_data[event[2][0]]:
