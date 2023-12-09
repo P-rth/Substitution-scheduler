@@ -15,6 +15,7 @@ A program to help with scheduling substitutions in schools
 7. filter needed teachers by department
 8. very user-friendly
 9. Universal search including (name / class / number of free periods /is Free?/is Unavailable?)
+10. sql support for local and remote databases
 ##
 
 ## First start & intro :
