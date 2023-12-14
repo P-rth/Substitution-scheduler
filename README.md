@@ -32,7 +32,7 @@ You can olso Export the exel data to the sql server (this will overwrite the pre
 
 Reading from a SQL server :
 
-![Exporting](https://i.ibb.co/MnGtbPv/image.png)
+![Exporting](https://i.imgur.com/tCPSBGj.png)
 
 After Selecting a valid data file the main window will open up :
 
