@@ -1,5 +1,6 @@
 
 
+
 # Substitution-schedule-assistant
 A program to help with scheduling substitutions in schools
 
@@ -19,12 +20,19 @@ A program to help with scheduling substitutions in schools
 ##
 
 ## First start & intro :
-When you start the program for the first time It will ask for a data file to read from :![enter image description here](https://i.ibb.co/1qynKs0/image.png)
+When you start the program for the first time It will ask where to read the data from (Excel Or a SQL server):
+
+![enter image description here](https://i.ibb.co/Nj9Fcwx/image.png)
 Here you can select the excel file with the containing all the teacher data by either clicking the 'browse' button or entering a path. The excel file should be in in a proper format to be read by the software.
-once the file is opened it  is copied into the program's directory named 'Teacher_data.xlsx' for convenience
+
+You can olso Export the exel data to the sql server (this will overwrite the previous data in SQL) :
+![Exporting](https://i.imgur.com/7nmxEJ8.png)
 
 
-After Selecting a valid data file a window like this will open up :
+Reading from a SQL server :
+![Exporting](https://i.ibb.co/MnGtbPv/image.png)
+
+After Selecting a valid data file the main window will open up :
 
 # Main Window
 
@@ -135,5 +143,23 @@ one sheet of the excel file only contains the time table for one teacher
 
 [Example File](https://github.com/P-rth/Substitution-scheduler/raw/main/Teacher_data.xlsx)
 
+# the SQL server layout
+the sql server is simple 2 table database.
+in the server a database is created named ssa_db inside the database there are 2 tables :
+teacher_data and time_table
 
-> Made with ❤ by Parth Sahni Using PySimpleGUI
+The teacher_data sheet stores the subject that teacher teaches and other related info (can be added in the future).
+The time_table sheet stores the name of the teacher along with the day number (0,1,2,3,4)
+and the time table of the teacher for that day
+
+### time_table :
+![time-table](https://i.imgur.com/qBwWC0J.png)
+
+### teacher_data :
+![teacher-data](https://i.imgur.com/iEgzE3u.png)
+
+
+
+
+
+> Made with ❤ by Parth Sahni
