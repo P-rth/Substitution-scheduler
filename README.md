@@ -26,10 +26,12 @@ When you start the program for the first time It will ask where to read the data
 Here you can select the excel file with the containing all the teacher data by either clicking the 'browse' button or entering a path. The excel file should be in in a proper format to be read by the software.
 
 You can olso Export the exel data to the sql server (this will overwrite the previous data in SQL) :
+
 ![Exporting](https://i.imgur.com/7nmxEJ8.png)
 
 
 Reading from a SQL server :
+
 ![Exporting](https://i.ibb.co/MnGtbPv/image.png)
 
 After Selecting a valid data file the main window will open up :
